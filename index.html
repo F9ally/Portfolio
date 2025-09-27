@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loic Lematre - CV & Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 50%, #ffffff 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar styling */
+        html {
+            scrollbar-width: thin; /* Firefox */
+            scrollbar-color: rgba(255,140,60,0.85) rgba(0,0,0,0);
+        }
+        body::-webkit-scrollbar { /* Chrome/Edge/Safari */
+            width: 12px;
+            height: 12px;
+        }
+        body::-webkit-scrollbar-track {
+            background: linear-gradient(180deg, rgba(0,0,0,0), rgba(255,120,40,0.08));
+        }
+        body::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #ff9a58, #ff6f1f, #cc4400);
+            border-radius: 10px;
+            border: 3px solid rgba(255,255,255,0.5);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
+        }
+        body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #ffad78, #ff7f33, #d14a00);
+        }
+
+        /* Gooey Lava Lamp Background */
+        .bg-shapes {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .lava-filter {
+            position: absolute;
+            width: 0;
+            height: 0;
+        }
+
+        .lava-bubbles {
+            position: absolute;
+            top: -30vh;
+            left: -5%;
+            width: 110%;
+            height: 160vh;
+            filter: url(#gooey-lava);
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .bubble {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-radius: 50%;
+            --hue: 24; /* base orange hue */
+            --sat: 100%;
+            --light-top: 92%;
+            --light-mid: 58%;
+            --light-edge: 36%;
+            background: radial-gradient(circle at 32% 26%, hsla(var(--hue), var(--sat), var(--light-top), 0.82), hsla(calc(var(--hue) + 2), var(--sat), var(--light-mid), 0.46) 46%, hsla(calc(var(--hue) - 12), 90%, var(--light-edge), 0.88) 100%);
+            box-shadow: inset 0 12px 24px rgba(255,255,255,0.28), inset 0 -18px 32px hsla(calc(var(--hue) - 18), 85%, 28%, 0.45), 0 20px 48px hsla(var(--hue), 90%, 55%, 0.14), 0 30px 70px hsla(calc(var(--hue) - 8), 65%, 44%, 0.12);
+            opacity: 0.8;
+            mix-blend-mode: screen;
+            filter: saturate(120%);
+            will-change: transform, width, height;
+        }
+
+        .bubble::after {
+            content: '';
+            position: absolute;
+            inset: 20% 24% 38% 20%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 25% 30%, rgba(255,255,255,0.7), transparent 65%);
+            opacity: 0.65;
+            filter: blur(1px);
+        }
+
+        .bubble--spark::before {
+            content: '';
+            position: absolute;
+            inset: 32% 35% 46% 35%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.75), rgba(255,190,140,0.45) 60%, transparent 100%);
+            filter: blur(1.5px);
+            opacity: 0.5;
+        }
+
+        /* Soft base glow under the lava area */
+        .lava-base {
+            position: absolute;
+            bottom: -6vh;
+            left: -10%;
+            width: 120%;
+            height: 20vh;
+            background: radial-gradient(ellipse at 50% 0%, rgba(255,122,40,0.38), rgba(204,68,0,0.22) 48%, rgba(204,68,0,0) 70%);
+            filter: blur(18px) saturate(120%);
+            pointer-events: none;
+        }
+
+        /* Header Styles */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #cc4400, #ff6600, #ff8533);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            letter-spacing: 0.6px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.06), 0 4px 12px rgba(0,0,0,0.12);
+            transition: transform 0.25s cubic-bezier(.2,.9,.2,1), opacity 0.25s ease;
+            display: inline-block;
+            padding: 0.12rem 0.18rem;
+            border-radius: 4px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0));
+        }
+
+        .logo:hover {
+            transform: translateY(-3px) scale(1.02);
+            opacity: 0.98;
+        }
+
+        nav {
+            position: relative;
+            padding-bottom: 0.85rem;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            position: relative;
+            overflow: visible;
+            transition: transform 220ms cubic-bezier(.2,.9,.2,1), color 200ms ease;
+            display: inline-block;
+        }
+
+        /* underline track + in-track progress fill */
+        nav a::before,
+        nav a::after {
+            content: '';
+            position: absolute;
+            left: 20%;
+            bottom: -0.48rem;
+            height: 3px;
+            width: 60%;
+            border-radius: 6px;
+            pointer-events: none;
+        }
+
+        /* track */
+        nav a::before {
+            background: linear-gradient(90deg, rgba(255,255,255,0.95), rgba(255,255,255,0.7));
+            opacity: 0;
+            transition: opacity 220ms ease;
+        }
+
+        /* fill */
+        nav a::after {
+            background: linear-gradient(90deg, rgba(255,204,170,0.85), rgba(255,153,85,0.95), rgba(255,115,0,0.95));
+            box-shadow: 0 0 14px rgba(255,153,85,0.35);
+            transform-origin: left center;
+            transform: scaleX(var(--nav-progress, 0));
+            opacity: 0;
+            transition: transform 250ms ease-out, opacity 200ms ease;
+        }
+
+        nav a:hover {
+            transform: translateY(-4px);
+            color: rgba(255,255,255,0.99);
+        }
+
+        nav a:hover::before {
+            opacity: 1;
+        }
+
+        nav a.active {
+            color: white;
+            box-shadow: 0 6px 20px rgba(204,68,0,0.14), inset 0 -2px 12px rgba(255,255,255,0.02);
+        }
+
+        nav a.active::before {
+            opacity: 1;
+            background: linear-gradient(90deg, #ffd9b8, #ffffff);
+        }
+
+        nav a.active::after {
+            opacity: 1;
+        }
+
+        nav a:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255,102,0,0.18);
+        }
+
+        /* removed separate nav progress bar; progress now fills the underline of the active link */
+
+        /* Main Content */
+        main {
+            margin-top: 80px;
+        }
+
+        .section {
+            min-height: 100vh;
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            scroll-margin-top: 120px;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #cc4400, #ff6600);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+
+        /* About Section */
+        .about-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 4rem;
+            align-items: start;
+            margin-top: 2rem;
+        }
+
+        .profile-image {
+            text-align: center;
+            position: sticky;
+            top: 120px;
+        }
+
+        .profile-image img {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid;
+            border-image: linear-gradient(135deg, #cc4400, #ff8533) 1;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .placeholder-image {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #cc4400, #ff6600, #ff8533);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .about-text {
+            padding-left: 0;
+        }
+
+        .about-text h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .about-text .subtitle {
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, #cc4400, #ff6600);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .about-text p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: #666;
+            text-align: justify;
+        }
+
+        /* CV Section */
+        .cv-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .cv-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid;
+            border-image: linear-gradient(135deg, #cc4400, #ff8533) 1;
+        }
+
+        .cv-card h3 {
+            background: linear-gradient(135deg, #cc4400, #ff6600);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .cv-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cv-item:last-child {
+            border-bottom: none;
+        }
+
+        .cv-item h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .cv-item .date {
+            background: linear-gradient(135deg, #cc4400, #ff6600);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .cv-item .location {
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Portfolio Section */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .portfolio-item {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .portfolio-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .portfolio-image {
+            height: 200px;
+            background: linear-gradient(135deg, #cc4400, #ff6600, #ff8533);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .portfolio-content {
+            padding: 1.5rem;
+        }
+
+        .portfolio-content h3 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .portfolio-content p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .portfolio-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            background: linear-gradient(135deg, #cc4400, #ff6600);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        /* Projects Section */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .project-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid;
+            border-image: linear-gradient(135deg, #cc4400, #ff8533) 1;
+        }
+
+        .project-card h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .project-card p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tech-tag {
+            background: #f0f0f0;
+            color: #333;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        .project-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .project-link {
+            background: linear-gradient(135deg, #cc4400, #ff6600);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .project-link:hover {
+            background: linear-gradient(135deg, #b33a00, #e55a00);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 0 1rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+            }
+
+            nav a {
+                padding: 0.3rem 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            .section {
+                padding: 2rem 1rem;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .about-text {
+                padding-left: 0;
+            }
+
+            .about-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .placeholder-image {
+                width: 250px;
+                height: 250px;
+            }
+
+            .cv-grid,
+            .portfolio-grid,
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            nav ul {
+                gap: 0.5rem;
+            }
+
+            nav a {
+                padding: 0.3rem 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+            }
+
+            .about-text h1 {
+                font-size: 2rem;
+            }
+
+            .placeholder-image {
+                width: 200px;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Gooey Lava Lamp Background -->
+    <div class="bg-shapes">
+        <svg class="lava-filter">
+            <defs>
+                <filter id="gooey-lava">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="18" result="blur"></feGaussianBlur>
+                    <feColorMatrix in="blur" mode="matrix" values="
+                        1 0 0 0 0
+                        0 1 0 0 0
+                        0 0 1 0 0
+                        0 0 0 24 -14" result="goo"></feColorMatrix>
+                    <feBlend in="SourceGraphic" in2="goo"></feBlend>
+                </filter>
+            </defs>
+        </svg>
+        <div class="lava-bubbles" id="lavaBubbles"></div>
+        <div class="lava-base"></div>
+    </div>
+
+    <header>
+        <div class="header-container">
+            <a href="#about" class="logo">Loic Lematre</a>
+            <nav>
+                <ul>
+                    <li><a href="#about" class="nav-link active">About</a></li>
+                    <li><a href="#cv" class="nav-link">CV</a></li>
+                    <li><a href="#portfolio" class="nav-link">Portfolio</a></li>
+                    <li><a href="#projects" class="nav-link">Projects</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- About Section -->
+        <section id="about" class="section">
+            <h2>About Me</h2>
+            <div class="about-content">
+                <div class="profile-image">
+                    <div class="placeholder-image">
+                        Your Photo Here
+                    </div>
+                </div>
+                <div class="about-text">
+                    <h1>Loic Lematre</h1>
+                    <div class="subtitle">Professional Developer & Designer</div>
+                    <p>Welcome to my professional portfolio. I am a passionate and dedicated professional with expertise in web development, design, and project management. With a keen eye for detail and a commitment to excellence, I strive to create innovative solutions that make a meaningful impact.</p>
+                    <p>I bring creativity, technical expertise, and a collaborative approach to every project. My goal is to deliver high-quality work that exceeds expectations and drives success for both clients and organizations.</p>
+                    <p>Feel free to explore my CV, portfolio, and projects to learn more about my experience and capabilities. I'm always open to new opportunities and exciting challenges.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CV Section -->
+        <section id="cv" class="section">
+            <h2>Curriculum Vitae</h2>
+            <div class="cv-grid">
+                <div class="cv-card">
+                    <h3>Professional Experience</h3>
+                    <div class="cv-item">
+                        <h4>Senior Developer</h4>
+                        <div class="date">2022 - Present</div>
+                        <div class="location">Tech Solutions Inc.</div>
+                        <p>Leading development projects and mentoring junior developers. Responsible for architecture decisions and code quality.</p>
+                    </div>
+                    <div class="cv-item">
+                        <h4>Full Stack Developer</h4>
+                        <div class="date">2020 - 2022</div>
+                        <div class="location">Digital Agency XYZ</div>
+                        <p>Developed and maintained web applications using modern technologies. Collaborated with design and marketing teams.</p>
+                    </div>
+                    <div class="cv-item">
+                        <h4>Junior Developer</h4>
+                        <div class="date">2018 - 2020</div>
+                        <div class="location">StartUp Solutions</div>
+                        <p>Built responsive websites and learned industry best practices. Gained experience in agile development methodologies.</p>
+                    </div>
+                </div>
+
+                <div class="cv-card">
+                    <h3>Education</h3>
+                    <div class="cv-item">
+                        <h4>Master's in Computer Science</h4>
+                        <div class="date">2016 - 2018</div>
+                        <div class="location">University of Technology</div>
+                        <p>Specialized in software engineering and web technologies. Graduated with honors.</p>
+                    </div>
+                    <div class="cv-item">
+                        <h4>Bachelor's in Information Technology</h4>
+                        <div class="date">2013 - 2016</div>
+                        <div class="location">Tech Institute</div>
+                        <p>Foundation in programming, databases, and system design. Active in coding clubs and hackathons.</p>
+                    </div>
+                </div>
+
+                <div class="cv-card">
+                    <h3>Skills & Certifications</h3>
+                    <div class="cv-item">
+                        <h4>Technical Skills</h4>
+                        <p>JavaScript, TypeScript, React, Node.js, Python, SQL, MongoDB, AWS, Git, Docker</p>
+                    </div>
+                    <div class="cv-item">
+                        <h4>Soft Skills</h4>
+                        <p>Team Leadership, Project Management, Problem Solving, Communication, Agile Methodologies</p>
+                    </div>
+                    <div class="cv-item">
+                        <h4>Certifications</h4>
+                        <p>AWS Certified Developer, Google Cloud Professional, Scrum Master Certified</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Portfolio Section -->
+        <section id="portfolio" class="section">
+            <h2>Portfolio</h2>
+            <div class="portfolio-grid">
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        Project Screenshot
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>E-Commerce Platform</h3>
+                        <p>A fully responsive e-commerce solution with modern UI/UX design, secure payment integration, and admin dashboard.</p>
+                        <div class="portfolio-tags">
+                            <span class="tag">React</span>
+                            <span class="tag">Node.js</span>
+                            <span class="tag">MongoDB</span>
+                            <span class="tag">Stripe</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        Project Screenshot
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Corporate Website</h3>
+                        <p>Professional corporate website with content management system, responsive design, and SEO optimization.</p>
+                        <div class="portfolio-tags">
+                            <span class="tag">WordPress</span>
+                            <span class="tag">PHP</span>
+                            <span class="tag">MySQL</span>
+                            <span class="tag">SEO</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        Project Screenshot
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Mobile App Design</h3>
+                        <p>UI/UX design for a fitness tracking mobile application with intuitive navigation and engaging user experience.</p>
+                        <div class="portfolio-tags">
+                            <span class="tag">Figma</span>
+                            <span class="tag">UI/UX</span>
+                            <span class="tag">Mobile Design</span>
+                            <span class="tag">Prototyping</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        Project Screenshot
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Data Visualization Dashboard</h3>
+                        <p>Interactive dashboard for business analytics with real-time data visualization and reporting capabilities.</p>
+                        <div class="portfolio-tags">
+                            <span class="tag">D3.js</span>
+                            <span class="tag">Python</span>
+                            <span class="tag">Flask</span>
+                            <span class="tag">PostgreSQL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="section">
+            <h2>Projects</h2>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <h3>Task Management System</h3>
+                    <p>A comprehensive task management application with team collaboration features, real-time updates, and project tracking capabilities. Built with modern web technologies and deployed on cloud infrastructure.</p>
+                    <div class="project-tech">
+                        <span class="tech-tag">React</span>
+                        <span class="tech-tag">TypeScript</span>
+                        <span class="tech-tag">Node.js</span>
+                        <span class="tech-tag">PostgreSQL</span>
+                        <span class="tech-tag">AWS</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#" class="project-link">View Demo</a>
+                        <a href="#" class="project-link">Source Code</a>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <h3>Weather Forecast App</h3>
+                    <p>A responsive weather application that provides detailed forecasts, historical data, and location-based weather alerts. Features include interactive maps and customizable notifications.</p>
+                    <div class="project-tech">
+                        <span class="tech-tag">Vue.js</span>
+                        <span class="tech-tag">JavaScript</span>
+                        <span class="tech-tag">Weather API</span>
+                        <span class="tech-tag">Chart.js</span>
+                        <span class="tech-tag">PWA</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#" class="project-link">View Demo</a>
+                        <a href="#" class="project-link">Source Code</a>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <h3>Portfolio Website Builder</h3>
+                    <p>A drag-and-drop website builder specifically designed for creating professional portfolios. Includes templates, custom styling options, and deployment integration.</p>
+                    <div class="project-tech">
+                        <span class="tech-tag">Angular</span>
+                        <span class="tech-tag">TypeScript</span>
+                        <span class="tech-tag">Firebase</span>
+                        <span class="tech-tag">Drag & Drop API</span>
+                        <span class="tech-tag">SCSS</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#" class="project-link">View Demo</a>
+                        <a href="#" class="project-link">Source Code</a>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <h3>Expense Tracker</h3>
+                    <p>A personal finance application for tracking expenses, managing budgets, and generating financial reports. Features include category management and spending analytics.</p>
+                    <div class="project-tech">
+                        <span class="tech-tag">React Native</span>
+                        <span class="tech-tag">JavaScript</span>
+                        <span class="tech-tag">SQLite</span>
+                        <span class="tech-tag">Chart.js</span>
+                        <span class="tech-tag">Mobile</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#" class="project-link">View Demo</a>
+                        <a href="#" class="project-link">Source Code</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Gooey lava lamp bubble generator
+        const bubbleContainer = document.getElementById('lavaBubbles');
+
+        const sections = Array.from(document.querySelectorAll('.section'));
+        const navLinks = Array.from(document.querySelectorAll('.nav-link'));
+
+        if (bubbleContainer) {
+            const randomBetween = (min, max) => Math.random() * (max - min) + min;
+
+            const getBubbleSettings = () => {
+                if (window.innerWidth < 600) {
+                    return { count: 4, minSize: 70, maxSize: 120, verticalSpeed: [-36, -24] };
+                }
+                if (window.innerWidth < 1024) {
+                    return { count: 7, minSize: 90, maxSize: 150, verticalSpeed: [-40, -28] };
+                }
+                return { count: 10, minSize: 110, maxSize: 180, verticalSpeed: [-46, -32] };
+            };
+
+            let currentSettings = getBubbleSettings();
+            let containerWidth = bubbleContainer.offsetWidth;
+            let containerHeight = bubbleContainer.offsetHeight;
+
+            const updateContainerMetrics = () => {
+                const rect = bubbleContainer.getBoundingClientRect();
+                containerWidth = rect.width;
+                containerHeight = rect.height;
+            };
+
+            const bubbles = [];
+
+            const applySize = (bubble) => {
+                const diameter = bubble.radius * 2;
+                bubble.el.style.width = `${diameter}px`;
+                bubble.el.style.height = `${diameter}px`;
+                bubble.mass = Math.max(1400, bubble.radius * bubble.radius * 0.75);
+            };
+
+            const resetBubble = (bubble, initial = false) => {
+                const { minSize, maxSize, verticalSpeed } = currentSettings;
+                updateContainerMetrics();
+
+                const diameter = randomBetween(minSize, maxSize);
+                bubble.radius = diameter / 2;
+                bubble.mass = Math.max(1400, bubble.radius * bubble.radius * 0.75);
+                bubble.cx = randomBetween(bubble.radius, Math.max(bubble.radius + 1, containerWidth - bubble.radius));
+                bubble.cy = containerHeight + randomBetween(bubble.radius, containerHeight * 0.4);
+                bubble.vx = randomBetween(-18, 18);
+                bubble.vy = randomBetween(verticalSpeed[0], verticalSpeed[1]);
+                bubble.life = 0;
+                bubble.maxLife = randomBetween(14000, 23000);
+                bubble.swirlAngle = randomBetween(0, Math.PI * 2);
+                bubble.swirlSpeed = randomBetween(0.25, 1.4);
+                bubble.swirlStrength = randomBetween(14, 32);
+                bubble.wavePhase = randomBetween(0, Math.PI * 2);
+                bubble.waveSpeed = randomBetween(0.35, 0.8);
+                bubble.spin = randomBetween(-0.6, 0.6);
+                bubble.rotation = randomBetween(0, Math.PI * 2);
+                bubble.el.classList.toggle('bubble--spark', Math.random() > 0.6);
+                // subtle color variance per bubble
+                const hueOffset = randomBetween(-6, 8);
+                const lightTop = 90 + randomBetween(-3, 3);
+                const lightMid = 56 + randomBetween(-4, 4);
+                const lightEdge = 34 + randomBetween(-3, 3);
+                bubble.el.style.setProperty('--hue', `${24 + hueOffset}`);
+                bubble.el.style.setProperty('--light-top', `${lightTop}%`);
+                bubble.el.style.setProperty('--light-mid', `${lightMid}%`);
+                bubble.el.style.setProperty('--light-edge', `${lightEdge}%`);
+                applySize(bubble);
+                bubble.el.style.opacity = initial ? '0' : '0.25';
+                bubble.el.style.transform = `translate3d(${bubble.cx - bubble.radius}px, ${bubble.cy - bubble.radius}px, 0)`;
+            };
+
+            const createBubble = () => {
+                const el = document.createElement('span');
+                el.className = 'bubble';
+                bubbleContainer.appendChild(el);
+
+                const bubble = {
+                    el,
+                    radius: 0,
+                    mass: 0,
+                    cx: 0,
+                    cy: 0,
+                    vx: 0,
+                    vy: 0,
+                    life: 0,
+                    maxLife: 0,
+                    swirlAngle: 0,
+                    swirlSpeed: 0,
+                    swirlStrength: 0,
+                    wavePhase: 0,
+                    waveSpeed: 0,
+                    spin: 0,
+                    rotation: 0
+                };
+
+                resetBubble(bubble, true);
+                bubbles.push(bubble);
+            };
+
+            const ensureBubbleCount = () => {
+                currentSettings = getBubbleSettings();
+                updateContainerMetrics();
+
+                while (bubbles.length < currentSettings.count) {
+                    createBubble();
+                }
+
+                while (bubbles.length > currentSettings.count) {
+                    const bubble = bubbles.pop();
+                    bubble.el.remove();
+                }
+
+                bubbles.forEach(bubble => {
+                    const diameter = bubble.radius * 2;
+                    if (diameter < currentSettings.minSize * 0.85 || diameter > currentSettings.maxSize * 1.15) {
+                        resetBubble(bubble);
+                    }
+                });
+            };
+
+            ensureBubbleCount();
+
+            let lastTimestamp = null;
+
+            const animate = (timestamp) => {
+                if (lastTimestamp === null) {
+                    lastTimestamp = timestamp;
+                }
+
+                const deltaMs = timestamp - lastTimestamp;
+                lastTimestamp = timestamp;
+                const dt = Math.min(deltaMs, 48) / 1000;
+
+                const buoyancy = 12;
+                const maxHorizontalSpeed = 85;
+                const edgeDamping = 0.45;
+                const restitution = 0.32;
+
+                for (let i = 0; i < bubbles.length; i++) {
+                    const bubble = bubbles[i];
+                    bubble.life += deltaMs;
+
+                    bubble.swirlAngle += bubble.swirlSpeed * dt;
+                    bubble.wavePhase += bubble.waveSpeed * dt;
+
+                    const swirlForceX = Math.cos(bubble.swirlAngle) * bubble.swirlStrength;
+                    const swirlForceY = Math.sin(bubble.swirlAngle) * bubble.swirlStrength * 0.22;
+                    const waveForce = Math.sin(bubble.wavePhase * 2 + bubble.swirlAngle * 0.35) * 9;
+
+                    bubble.vx += (swirlForceX + waveForce) * dt;
+                    bubble.vy += swirlForceY * dt;
+                    bubble.vy -= buoyancy * dt;
+
+                    bubble.vx *= (1 - 0.08 * dt);
+                    bubble.vy *= (1 - 0.018 * dt);
+
+                    bubble.vx = Math.max(Math.min(bubble.vx, maxHorizontalSpeed), -maxHorizontalSpeed);
+                    bubble.rotation += bubble.spin * dt;
+                    if (bubble.rotation > Math.PI * 2 || bubble.rotation < -Math.PI * 2) {
+                        bubble.rotation %= (Math.PI * 2);
+                    }
+
+                    bubble.cx += bubble.vx * dt;
+                    bubble.cy += bubble.vy * dt;
+
+                    // boundary constraints
+                    if (bubble.cx < bubble.radius) {
+                        bubble.cx = bubble.radius;
+                        bubble.vx *= -edgeDamping;
+                    } else if (bubble.cx > containerWidth - bubble.radius) {
+                        bubble.cx = containerWidth - bubble.radius;
+                        bubble.vx *= -edgeDamping;
+                    }
+
+                    if (bubble.cy > containerHeight + bubble.radius * 1.5) {
+                        bubble.cy = containerHeight + bubble.radius * 1.5;
+                        bubble.vy *= -0.25;
+                    }
+
+                    // fade control (more discreet)
+                    const riseProgress = 1 - (bubble.cy / (containerHeight + bubble.radius));
+                    bubble.el.style.opacity = Math.min(0.65, Math.max(0, riseProgress + 0.08));
+
+                    // reposition if out of bounds or life exceeded
+                    if (bubble.cy + bubble.radius < -containerHeight * 0.15 || bubble.life > bubble.maxLife) {
+                        resetBubble(bubble);
+                        continue;
+                    }
+                }
+
+                // collision & response handling
+                for (let i = 0; i < bubbles.length; i++) {
+                    const bubbleA = bubbles[i];
+                    for (let j = i + 1; j < bubbles.length; j++) {
+                        const bubbleB = bubbles[j];
+                        const dx = bubbleB.cx - bubbleA.cx;
+                        const dy = bubbleB.cy - bubbleA.cy;
+                        const distance = Math.hypot(dx, dy);
+                        const minDist = bubbleA.radius + bubbleB.radius;
+
+                        if (distance > 0 && distance < minDist) {
+                            const nx = dx / distance;
+                            const ny = dy / distance;
+                            const overlap = (minDist - distance);
+
+                            // separate overlapping bubbles equally
+                            bubbleA.cx -= nx * overlap * 0.5;
+                            bubbleA.cy -= ny * overlap * 0.5;
+                            bubbleB.cx += nx * overlap * 0.5;
+                            bubbleB.cy += ny * overlap * 0.5;
+
+                            const relVel = (bubbleB.vx - bubbleA.vx) * nx + (bubbleB.vy - bubbleA.vy) * ny;
+                            if (relVel < 0) {
+                                const impulse = -(1 + restitution) * relVel / ((1 / bubbleA.mass) + (1 / bubbleB.mass));
+                                const impulseX = impulse * nx;
+                                const impulseY = impulse * ny;
+
+                                bubbleA.vx -= impulseX / bubbleA.mass;
+                                bubbleA.vy -= impulseY / bubbleA.mass;
+                                bubbleB.vx += impulseX / bubbleB.mass;
+                                bubbleB.vy += impulseY / bubbleB.mass;
+                            }
+
+                            // apply slight tangential interaction for more natural movement
+                            const tangentX = -ny;
+                            const tangentY = nx;
+                            const relTan = (bubbleB.vx - bubbleA.vx) * tangentX + (bubbleB.vy - bubbleA.vy) * tangentY;
+                            const surfaceFriction = relTan * 0.015;
+
+                            bubbleA.vx += (surfaceFriction * tangentX) / bubbleA.mass;
+                            bubbleA.vy += (surfaceFriction * tangentY) / bubbleA.mass;
+                            bubbleB.vx -= (surfaceFriction * tangentX) / bubbleB.mass;
+                            bubbleB.vy -= (surfaceFriction * tangentY) / bubbleB.mass;
+                        }
+                    }
+                }
+
+                // apply transforms after physics updates
+                for (let i = 0; i < bubbles.length; i++) {
+                    const bubble = bubbles[i];
+                    bubble.el.style.transform = `translate3d(${bubble.cx - bubble.radius}px, ${bubble.cy - bubble.radius}px, 0) rotate(${bubble.rotation}rad)`;
+                }
+
+                requestAnimationFrame(animate);
+            };
+
+            requestAnimationFrame(animate);
+
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    ensureBubbleCount();
+                }, 120);
+            });
+        }
+
+        // Active navigation highlighting and inline progress fill
+        const onScrollUpdate = () => {
+            const scrollPosition = window.scrollY || window.pageYOffset;
+            let current = '';
+            let activeSection = null;
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 120;
+                const sectionHeight = section.offsetHeight;
+                if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                    current = section.getAttribute('id');
+                    activeSection = { section, sectionTop, sectionHeight };
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                link.style.removeProperty('--nav-progress');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+
+            // Drive the underline fill of the active link via CSS variable
+            if (activeSection) {
+                const progress = Math.min(Math.max((scrollPosition - activeSection.sectionTop) / activeSection.sectionHeight, 0), 1);
+                const activeLink = navLinks.find(l => l.classList.contains('active'));
+                if (activeLink) activeLink.style.setProperty('--nav-progress', progress);
+            }
+        };
+
+        window.addEventListener('scroll', onScrollUpdate);
+        window.addEventListener('DOMContentLoaded', onScrollUpdate);
+
+        // Add subtle animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Apply animation to cards
+        document.querySelectorAll('.cv-card, .portfolio-item, .project-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
+ 
