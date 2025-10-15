@@ -2,6 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- Favicon using profile picture -->
+        <!-- Favicon using profile picture, styled as round -->
+        <link rel="icon" type="image/jpeg" href="growing face.jpg" id="favicon">
+        <style>
+            /* Attempt to make favicon round in supported browsers */
+            link#favicon[rel~="icon"] {
+                mask-image: radial-gradient(circle, white 99%, transparent 100%);
+                -webkit-mask-image: radial-gradient(circle, white 99%, transparent 100%);
+                border-radius: 50%;
+            }
+        </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loic Lematre - CV & Portfolio</title>
     <style>
