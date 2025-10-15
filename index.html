@@ -22,14 +22,17 @@
             background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 50%, #ffffff 100%);
             min-height: 100vh;
             overflow-x: hidden;
+                font-display: swap;
         }
 
         /* Scrollbar styling */
+        /* Firefox scrollbar */
         html {
-            scrollbar-width: thin; /* Firefox */
+            scrollbar-width: thin;
             scrollbar-color: rgba(255,140,60,0.85) rgba(0,0,0,0);
         }
-        body::-webkit-scrollbar { /* Chrome/Edge/Safari */
+        /* Webkit browsers (Chrome/Edge/Safari) scrollbar */
+        body::-webkit-scrollbar {
             width: 12px;
             height: 12px;
         }
@@ -55,6 +58,7 @@
             z-index: -1;
             pointer-events: none;
             overflow: hidden;
+                will-change: transform;
         }
 
         .lava-filter {
@@ -72,7 +76,31 @@
             filter: url(#gooey-lava);
             overflow: hidden;
             pointer-events: none;
+                transform: translateZ(0);
+            display: none; /* Hidden, canvas is used instead */
         }
+
+        /* Performance mode blur tweaks via data attribute */
+        .lava-bubbles[data-blur="mid"] {
+            filter: url(#gooey-lava) brightness(1.02) saturate(1.05);
+        }
+        .lava-bubbles[data-blur="low"] {
+            filter: url(#gooey-lava) brightness(1.04) saturate(1.08) contrast(0.96);
+        }
+
+        /* Canvas replacement for bubbles */
+        #lavaCanvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            mix-blend-mode: screen;
+            filter: saturate(115%) contrast(102%);
+            contain: layout style paint;
+        }
+        #lavaCanvas.low-perf { filter: saturate(105%) contrast(98%); }
+        #lavaCanvas.mid-perf { filter: saturate(110%) contrast(100%); }
 
         .bubble {
             position: absolute;
@@ -84,12 +112,12 @@
             --light-top: 92%;
             --light-mid: 58%;
             --light-edge: 36%;
-            background: radial-gradient(circle at 32% 26%, hsla(var(--hue), var(--sat), var(--light-top), 0.82), hsla(calc(var(--hue) + 2), var(--sat), var(--light-mid), 0.46) 46%, hsla(calc(var(--hue) - 12), 90%, var(--light-edge), 0.88) 100%);
-            box-shadow: inset 0 12px 24px rgba(255,255,255,0.28), inset 0 -18px 32px hsla(calc(var(--hue) - 18), 85%, 28%, 0.45), 0 20px 48px hsla(var(--hue), 90%, 55%, 0.14), 0 30px 70px hsla(calc(var(--hue) - 8), 65%, 44%, 0.12);
-            opacity: 0.8;
-            mix-blend-mode: screen;
-            filter: saturate(120%);
-            will-change: transform, width, height;
+              background: radial-gradient(circle at 32% 26%, hsla(var(--hue), var(--sat), var(--light-top), 0.82), hsla(calc(var(--hue) + 2), var(--sat), var(--light-mid), 0.46) 46%, hsla(calc(var(--hue) - 12), 90%, var(--light-edge), 0.88) 100%);
+              box-shadow: inset 0 8px 16px rgba(255,255,255,0.25), inset 0 -12px 20px hsla(calc(var(--hue) - 18), 85%, 28%, 0.4), 0 15px 35px hsla(var(--hue), 90%, 55%, 0.12);
+              opacity: 0.8;
+              mix-blend-mode: screen;
+              will-change: transform;
+              contain: layout style paint;
         }
 
         .bubble::after {
@@ -98,8 +126,7 @@
             inset: 20% 24% 38% 20%;
             border-radius: 50%;
             background: radial-gradient(circle at 25% 30%, rgba(255,255,255,0.7), transparent 65%);
-            opacity: 0.65;
-            filter: blur(1px);
+              opacity: 0.6;
         }
 
         .bubble--spark::before {
@@ -108,20 +135,7 @@
             inset: 32% 35% 46% 35%;
             border-radius: 50%;
             background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.75), rgba(255,190,140,0.45) 60%, transparent 100%);
-            filter: blur(1.5px);
             opacity: 0.5;
-        }
-
-        /* Soft base glow under the lava area */
-        .lava-base {
-            position: absolute;
-            bottom: -6vh;
-            left: -10%;
-            width: 120%;
-            height: 20vh;
-            background: radial-gradient(ellipse at 50% 0%, rgba(255,122,40,0.38), rgba(204,68,0,0.22) 48%, rgba(204,68,0,0) 70%);
-            filter: blur(18px) saturate(120%);
-            pointer-events: none;
         }
 
         /* Header Styles */
@@ -160,6 +174,14 @@
             padding: 0.12rem 0.18rem;
             border-radius: 4px;
             background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0));
+        }
+
+        .logo-short {
+            display: none;
+        }
+
+        .logo-full {
+            display: inline;
         }
 
         .logo:hover {
@@ -284,18 +306,47 @@
 
         .profile-image {
             text-align: center;
-            position: sticky;
-            top: 120px;
+            align-self: start;
         }
 
-        .profile-image img {
-            width: 300px;
-            height: 300px;
+        /* Circular framed profile photo wrapper */
+        .profile-frame {
+            width: 320px; /* frame outer diameter */
+            height: 320px;
             border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            padding: 8px; /* thickness of the gradient ring */
+            background: conic-gradient(from 180deg at 50% 50%, #cc4400, #ff8533, #ff6600, #cc4400);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .profile-frame:hover {
+            transform: scale(1.05);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+        }
+
+        .profile-frame .frame-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: white; /* inner background so the ring is visible */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .profile-frame img {
+            width: calc(100% - 16px); /* account for padding visually */
+            height: calc(100% - 16px);
             object-fit: cover;
-            border: 5px solid;
-            border-image: linear-gradient(135deg, #cc4400, #ff8533) 1;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: block;
+            border-radius: 50%;
         }
 
         .placeholder-image {
@@ -345,6 +396,7 @@
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
             margin-top: 2rem;
+                will-change: auto;
         }
 
         .cv-card {
@@ -354,6 +406,7 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             border-left: 4px solid;
             border-image: linear-gradient(135deg, #cc4400, #ff8533) 1;
+                will-change: auto;
         }
 
         .cv-card h3 {
@@ -400,6 +453,7 @@
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 2rem;
             margin-top: 2rem;
+                will-change: auto;
         }
 
         .portfolio-item {
@@ -408,6 +462,7 @@
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
+                will-change: auto;
         }
 
         .portfolio-item:hover {
@@ -458,6 +513,7 @@
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 2rem;
             margin-top: 2rem;
+                will-change: auto;
         }
 
         .project-card {
@@ -467,6 +523,7 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             border-top: 4px solid;
             border-image: linear-gradient(135deg, #cc4400, #ff8533) 1;
+                will-change: auto;
         }
 
         .project-card h3 {
@@ -518,15 +575,26 @@
         @media (max-width: 768px) {
             .header-container {
                 padding: 0 1rem;
+                flex-wrap: wrap;
+            }
+
+            .logo-full {
+                display: none;
+            }
+
+            .logo-short {
+                display: inline;
             }
 
             nav ul {
-                gap: 1rem;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                justify-content: center;
             }
 
             nav a {
-                padding: 0.3rem 0.8rem;
-                font-size: 0.9rem;
+                padding: 0.4rem 0.7rem;
+                font-size: 0.85rem;
             }
 
             .section {
@@ -536,6 +604,7 @@
             .about-content {
                 grid-template-columns: 1fr;
                 text-align: center;
+                gap: 2rem;
             }
 
             .about-text {
@@ -544,6 +613,11 @@
 
             .about-text h1 {
                 font-size: 2.5rem;
+            }
+
+            .profile-frame {
+                width: 250px;
+                height: 250px;
             }
 
             .placeholder-image {
@@ -559,13 +633,34 @@
         }
 
         @media (max-width: 480px) {
-            nav ul {
+            header {
+                padding: 0.8rem 0;
+            }
+
+
+            .header-container {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
                 gap: 0.5rem;
             }
 
+            .logo {
+                font-size: 1.3rem;
+            }
+
+            nav ul {
+                gap: 0.4rem;
+            }
+
             nav a {
-                padding: 0.3rem 0.5rem;
-                font-size: 0.8rem;
+                padding: 0.35rem 0.6rem;
+                font-size: 0.75rem;
+            }
+
+            .section {
+                padding: 1.5rem 1rem;
+                min-height: auto;
             }
 
             .section h2 {
@@ -576,36 +671,72 @@
                 font-size: 2rem;
             }
 
+            .profile-frame {
+                width: 200px;
+                height: 200px;
+            }
+
             .placeholder-image {
                 width: 200px;
                 height: 200px;
             }
+        }
+
+        /* Footer Styles */
+        footer {
+            position: relative;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            padding: 3rem 2rem 2rem;
+            text-align: center;
+            overflow: hidden;
+            margin-top: 4rem;
+        }
+
+        footer .lava-base {
+            position: absolute;
+            top: 0;
+            left: -10%;
+            width: 120%;
+            height: 80%;
+            background: radial-gradient(ellipse at 50% 0%, rgba(255,122,40,0.42), rgba(204,68,0,0.26) 48%, rgba(204,68,0,0) 70%);
+            filter: blur(20px) saturate(120%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        footer p {
+            position: relative;
+            z-index: 1;
+            color: #666;
+            font-size: 0.95rem;
+            margin: 0;
         }
     </style>
 </head>
 <body>
     <!-- Gooey Lava Lamp Background -->
     <div class="bg-shapes">
+        <canvas id="lavaCanvas" aria-hidden="true"></canvas>
         <svg class="lava-filter">
             <defs>
                 <filter id="gooey-lava">
-                    <feGaussianBlur in="SourceGraphic" stdDeviation="18" result="blur"></feGaussianBlur>
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="blur"></feGaussianBlur>
                     <feColorMatrix in="blur" mode="matrix" values="
                         1 0 0 0 0
                         0 1 0 0 0
                         0 0 1 0 0
-                        0 0 0 24 -14" result="goo"></feColorMatrix>
+                            0 0 0 22 -12" result="goo"></feColorMatrix>
                     <feBlend in="SourceGraphic" in2="goo"></feBlend>
                 </filter>
             </defs>
         </svg>
-        <div class="lava-bubbles" id="lavaBubbles"></div>
-        <div class="lava-base"></div>
+    <!-- Fallback static DOM bubbles container kept (emptied) for no-canvas environments -->
+    <div class="lava-bubbles" id="lavaBubbles"></div>
     </div>
 
     <header>
         <div class="header-container">
-            <a href="#about" class="logo">Loic Lematre</a>
+            <a href="#about" class="logo"><span class="logo-full">Loic Lematre</span><span class="logo-short">LL</span></a>
             <nav>
                 <ul>
                     <li><a href="#about" class="nav-link active">About</a></li>
@@ -623,16 +754,28 @@
             <h2>About Me</h2>
             <div class="about-content">
                 <div class="profile-image">
-                    <div class="placeholder-image">
-                        Your Photo Here
+                    <div class="profile-frame">
+                        <div class="frame-inner">
+                            <img src="growing face.jpg" alt="Loic Lematre">
+                        </div>
                     </div>
                 </div>
                 <div class="about-text">
                     <h1>Loic Lematre</h1>
-                    <div class="subtitle">Professional Developer & Designer</div>
-                    <p>Welcome to my professional portfolio. I am a passionate and dedicated professional with expertise in web development, design, and project management. With a keen eye for detail and a commitment to excellence, I strive to create innovative solutions that make a meaningful impact.</p>
-                    <p>I bring creativity, technical expertise, and a collaborative approach to every project. My goal is to deliver high-quality work that exceeds expectations and drives success for both clients and organizations.</p>
-                    <p>Feel free to explore my CV, portfolio, and projects to learn more about my experience and capabilities. I'm always open to new opportunities and exciting challenges.</p>
+                    <div class="subtitle">Creative Tech Enthusiast</div>
+                    <p>Creative individual with a passion for computers, DIY electronics, storytelling and video production. Currently writing a novel and runnning a YouTube channel (Alleywood Movies).</p>
+                    <p>Enthusiastic about expanding technical skills. Strong interpersonal skills, and eager to continue learning.</p>
+                    <p>
+                        <strong>Contact:</strong><br>
+                        📍 Mallow, Co. Cork<br>
+                        📧 <a href="mailto:loiclematre@gmail.com" style="color: #ff6600;">loiclematre@gmail.com</a><br>
+                        📱 089 488 6009
+                    </p>
+                    <p>
+                        <strong>Links:</strong><br>
+                        🎓 <a href="https://www.credly.com/users/loic-lematre" target="_blank" style="color: #ff6600;">My Certifications (Credly)</a><br>
+                        🎬 <a href="https://youtube.com/@alleywoodmovies" target="_blank" style="color: #ff6600;">Alleywood Movies (YouTube)</a>
+                    </p>
                 </div>
             </div>
         </section>
@@ -642,56 +785,59 @@
             <h2>Curriculum Vitae</h2>
             <div class="cv-grid">
                 <div class="cv-card">
-                    <h3>Professional Experience</h3>
+                    <h3>Work Experience</h3>
                     <div class="cv-item">
-                        <h4>Senior Developer</h4>
-                        <div class="date">2022 - Present</div>
-                        <div class="location">Tech Solutions Inc.</div>
-                        <p>Leading development projects and mentoring junior developers. Responsible for architecture decisions and code quality.</p>
+                        <h4>Family Cleaning Business</h4>
+                        <div class="date">Ongoing</div>
+                        <p>Assisting with the family cleaning business.</p>
                     </div>
                     <div class="cv-item">
-                        <h4>Full Stack Developer</h4>
-                        <div class="date">2020 - 2022</div>
-                        <div class="location">Digital Agency XYZ</div>
-                        <p>Developed and maintained web applications using modern technologies. Collaborated with design and marketing teams.</p>
-                    </div>
-                    <div class="cv-item">
-                        <h4>Junior Developer</h4>
-                        <div class="date">2018 - 2020</div>
-                        <div class="location">StartUp Solutions</div>
-                        <p>Built responsive websites and learned industry best practices. Gained experience in agile development methodologies.</p>
+                        <h4>Video Production</h4>
+                        <div class="date">Ongoing</div>
+                        <p>Producing promotional videos and content for Alleywood Movies YouTube channel.</p>
                     </div>
                 </div>
 
                 <div class="cv-card">
                     <h3>Education</h3>
                     <div class="cv-item">
-                        <h4>Master's in Computer Science</h4>
-                        <div class="date">2016 - 2018</div>
-                        <div class="location">University of Technology</div>
-                        <p>Specialized in software engineering and web technologies. Graduated with honors.</p>
+                        <h4>Project Management QQI Level 6</h4>
+                        <div class="date">Currently Completing</div>
+                        <p>Advanced qualification in project management principles and practices.</p>
                     </div>
                     <div class="cv-item">
-                        <h4>Bachelor's in Information Technology</h4>
-                        <div class="date">2013 - 2016</div>
-                        <div class="location">Tech Institute</div>
-                        <p>Foundation in programming, databases, and system design. Active in coding clubs and hackathons.</p>
+                        <h4>Leaving Certificate</h4>
+                        <div class="date">Completed 2024</div>
+                        <p>Successfully completed secondary education.</p>
                     </div>
                 </div>
 
                 <div class="cv-card">
                     <h3>Skills & Certifications</h3>
                     <div class="cv-item">
+                        <h4>IT Certifications</h4>
+                        <p>• CompTIA A+<br>
+                        • CompTIA Network+<br>
+                        • CompTIA Cloud+<br>
+                        • Google Cybersecurity<br>
+                        • Crash Course on Python<br>
+                        • Pearson Networking, Network Security, and Device Configuration and Management</p>
+                    </div>
+                    <div class="cv-item">
+                        <h4>Other Certifications</h4>
+                        <p>• Far First Aid certified by PHECC</p>
+                    </div>
+                    <div class="cv-item">
                         <h4>Technical Skills</h4>
-                        <p>JavaScript, TypeScript, React, Node.js, Python, SQL, MongoDB, AWS, Git, Docker</p>
+                        <p>• Video editing software (DaVinci Resolve, CapCut)<br>
+                        • 3D design and printing<br>
+                        • Custom PC building<br>
+                        • DIY electronics</p>
                     </div>
                     <div class="cv-item">
-                        <h4>Soft Skills</h4>
-                        <p>Team Leadership, Project Management, Problem Solving, Communication, Agile Methodologies</p>
-                    </div>
-                    <div class="cv-item">
-                        <h4>Certifications</h4>
-                        <p>AWS Certified Developer, Google Cloud Professional, Scrum Master Certified</p>
+                        <h4>Languages</h4>
+                        <p>• English (Native)<br>
+                        • French (Fluent)</p>
                     </div>
                 </div>
             </div>
@@ -703,67 +849,21 @@
             <div class="portfolio-grid">
                 <div class="portfolio-item">
                     <div class="portfolio-image">
-                        Project Screenshot
+                        🎬 Video Content
                     </div>
                     <div class="portfolio-content">
-                        <h3>E-Commerce Platform</h3>
-                        <p>A fully responsive e-commerce solution with modern UI/UX design, secure payment integration, and admin dashboard.</p>
+                        <h3>Alleywood Movies YouTube Channel</h3>
+                        <p>Creative and diverse channel featuring original content, storytelling, and film projects.</p>
                         <div class="portfolio-tags">
-                            <span class="tag">React</span>
-                            <span class="tag">Node.js</span>
-                            <span class="tag">MongoDB</span>
-                            <span class="tag">Stripe</span>
+                            <span class="tag">Video Production</span>
+                            <span class="tag">DaVinci Resolve</span>
+                            <span class="tag">CapCut</span>
+                            <span class="tag">Storytelling</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="portfolio-item">
-                    <div class="portfolio-image">
-                        Project Screenshot
-                    </div>
-                    <div class="portfolio-content">
-                        <h3>Corporate Website</h3>
-                        <p>Professional corporate website with content management system, responsive design, and SEO optimization.</p>
-                        <div class="portfolio-tags">
-                            <span class="tag">WordPress</span>
-                            <span class="tag">PHP</span>
-                            <span class="tag">MySQL</span>
-                            <span class="tag">SEO</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="portfolio-item">
-                    <div class="portfolio-image">
-                        Project Screenshot
-                    </div>
-                    <div class="portfolio-content">
-                        <h3>Mobile App Design</h3>
-                        <p>UI/UX design for a fitness tracking mobile application with intuitive navigation and engaging user experience.</p>
-                        <div class="portfolio-tags">
-                            <span class="tag">Figma</span>
-                            <span class="tag">UI/UX</span>
-                            <span class="tag">Mobile Design</span>
-                            <span class="tag">Prototyping</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="portfolio-item">
-                    <div class="portfolio-image">
-                        Project Screenshot
-                    </div>
-                    <div class="portfolio-content">
-                        <h3>Data Visualization Dashboard</h3>
-                        <p>Interactive dashboard for business analytics with real-time data visualization and reporting capabilities.</p>
-                        <div class="portfolio-tags">
-                            <span class="tag">D3.js</span>
-                            <span class="tag">Python</span>
-                            <span class="tag">Flask</span>
-                            <span class="tag">PostgreSQL</span>
-                        </div>
-                    </div>
-                </div>
+                <!-- Promotional Video Production removed as requested -->
             </div>
         </section>
 
@@ -771,365 +871,210 @@
         <section id="projects" class="section">
             <h2>Projects</h2>
             <div class="projects-grid">
+                <!-- Alleywood Movies and Custom PC Build removed as requested -->
                 <div class="project-card">
-                    <h3>Task Management System</h3>
-                    <p>A comprehensive task management application with team collaboration features, real-time updates, and project tracking capabilities. Built with modern web technologies and deployed on cloud infrastructure.</p>
+                    <h3>3D Design, Printing & DIY Electronics</h3>
+                    <p>Creating custom 3D prints for various projects, often combined with DIY electronics.</p>
                     <div class="project-tech">
-                        <span class="tech-tag">React</span>
-                        <span class="tech-tag">TypeScript</span>
-                        <span class="tech-tag">Node.js</span>
-                        <span class="tech-tag">PostgreSQL</span>
-                        <span class="tech-tag">AWS</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="#" class="project-link">View Demo</a>
-                        <a href="#" class="project-link">Source Code</a>
+                        <span class="tech-tag">3D Printing</span>
+                        <span class="tech-tag">DIY Electronics</span>
+                        <span class="tech-tag">Arduino</span>
                     </div>
                 </div>
-
                 <div class="project-card">
-                    <h3>Weather Forecast App</h3>
-                    <p>A responsive weather application that provides detailed forecasts, historical data, and location-based weather alerts. Features include interactive maps and customizable notifications.</p>
+                    <h3>Day2Day News Website</h3>
+                    <p>A simplistic news site delivering daily news snippets summarised by AI per topic. Focused on bitesized content making it easy to stay up to date.</p>
                     <div class="project-tech">
-                        <span class="tech-tag">Vue.js</span>
-                        <span class="tech-tag">JavaScript</span>
-                        <span class="tech-tag">Weather API</span>
-                        <span class="tech-tag">Chart.js</span>
-                        <span class="tech-tag">PWA</span>
+                        <span class="tech-tag">AI Summarisation</span>
+                        <span class="tech-tag">Website hosting</span>
+                        <span class="tech-tag">Github</span>
+                        <span class="tech-tag">Vibe Coding</span>
                     </div>
                     <div class="project-links">
-                        <a href="#" class="project-link">View Demo</a>
-                        <a href="#" class="project-link">Source Code</a>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <h3>Portfolio Website Builder</h3>
-                    <p>A drag-and-drop website builder specifically designed for creating professional portfolios. Includes templates, custom styling options, and deployment integration.</p>
-                    <div class="project-tech">
-                        <span class="tech-tag">Angular</span>
-                        <span class="tech-tag">TypeScript</span>
-                        <span class="tech-tag">Firebase</span>
-                        <span class="tech-tag">Drag & Drop API</span>
-                        <span class="tech-tag">SCSS</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="#" class="project-link">View Demo</a>
-                        <a href="#" class="project-link">Source Code</a>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <h3>Expense Tracker</h3>
-                    <p>A personal finance application for tracking expenses, managing budgets, and generating financial reports. Features include category management and spending analytics.</p>
-                    <div class="project-tech">
-                        <span class="tech-tag">React Native</span>
-                        <span class="tech-tag">JavaScript</span>
-                        <span class="tech-tag">SQLite</span>
-                        <span class="tech-tag">Chart.js</span>
-                        <span class="tech-tag">Mobile</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="#" class="project-link">View Demo</a>
-                        <a href="#" class="project-link">Source Code</a>
+                        <!-- placeholder for future link -->
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <script>
-        // Gooey lava lamp bubble generator
-        const bubbleContainer = document.getElementById('lavaBubbles');
+    <footer>
+        <div class="lava-base"></div>
+        <p>&copy; 2025 LL. All rights reserved.</p>
+    </footer>
 
+    <script>
+        // Canvas lava lamp background (metaball style)
+        const lavaCanvas = document.getElementById('lavaCanvas');
+        const ctx = lavaCanvas && lavaCanvas.getContext ? lavaCanvas.getContext('2d') : null;
         const sections = Array.from(document.querySelectorAll('.section'));
         const navLinks = Array.from(document.querySelectorAll('.nav-link'));
 
-        if (bubbleContainer) {
-            const randomBetween = (min, max) => Math.random() * (max - min) + min;
+    let blobs = [];
+    let perfMode = 'low'; // forced low mode
+    let animationPaused = false;
+    let lastTs = null;
+    let skipAccumulator = 0;
+            const targetLowFPS = 1000/33; // ~30fps target for even lower CPU usage
+        const rnd = (a,b)=> Math.random()*(b-a)+a;
 
-            const getBubbleSettings = () => {
-                if (window.innerWidth < 600) {
-                    return { count: 4, minSize: 70, maxSize: 120, verticalSpeed: [-36, -24] };
-                }
-                if (window.innerWidth < 1024) {
-                    return { count: 7, minSize: 90, maxSize: 150, verticalSpeed: [-40, -28] };
-                }
-                return { count: 10, minSize: 110, maxSize: 180, verticalSpeed: [-46, -32] };
-            };
-
-            let currentSettings = getBubbleSettings();
-            let containerWidth = bubbleContainer.offsetWidth;
-            let containerHeight = bubbleContainer.offsetHeight;
-
-            const updateContainerMetrics = () => {
-                const rect = bubbleContainer.getBoundingClientRect();
-                containerWidth = rect.width;
-                containerHeight = rect.height;
-            };
-
-            const bubbles = [];
-
-            const applySize = (bubble) => {
-                const diameter = bubble.radius * 2;
-                bubble.el.style.width = `${diameter}px`;
-                bubble.el.style.height = `${diameter}px`;
-                bubble.mass = Math.max(1400, bubble.radius * bubble.radius * 0.75);
-            };
-
-            const resetBubble = (bubble, initial = false) => {
-                const { minSize, maxSize, verticalSpeed } = currentSettings;
-                updateContainerMetrics();
-
-                const diameter = randomBetween(minSize, maxSize);
-                bubble.radius = diameter / 2;
-                bubble.mass = Math.max(1400, bubble.radius * bubble.radius * 0.75);
-                bubble.cx = randomBetween(bubble.radius, Math.max(bubble.radius + 1, containerWidth - bubble.radius));
-                bubble.cy = containerHeight + randomBetween(bubble.radius, containerHeight * 0.4);
-                bubble.vx = randomBetween(-18, 18);
-                bubble.vy = randomBetween(verticalSpeed[0], verticalSpeed[1]);
-                bubble.life = 0;
-                bubble.maxLife = randomBetween(14000, 23000);
-                bubble.swirlAngle = randomBetween(0, Math.PI * 2);
-                bubble.swirlSpeed = randomBetween(0.25, 1.4);
-                bubble.swirlStrength = randomBetween(14, 32);
-                bubble.wavePhase = randomBetween(0, Math.PI * 2);
-                bubble.waveSpeed = randomBetween(0.35, 0.8);
-                bubble.spin = randomBetween(-0.6, 0.6);
-                bubble.rotation = randomBetween(0, Math.PI * 2);
-                bubble.el.classList.toggle('bubble--spark', Math.random() > 0.6);
-                // subtle color variance per bubble
-                const hueOffset = randomBetween(-6, 8);
-                const lightTop = 90 + randomBetween(-3, 3);
-                const lightMid = 56 + randomBetween(-4, 4);
-                const lightEdge = 34 + randomBetween(-3, 3);
-                bubble.el.style.setProperty('--hue', `${24 + hueOffset}`);
-                bubble.el.style.setProperty('--light-top', `${lightTop}%`);
-                bubble.el.style.setProperty('--light-mid', `${lightMid}%`);
-                bubble.el.style.setProperty('--light-edge', `${lightEdge}%`);
-                applySize(bubble);
-                bubble.el.style.opacity = initial ? '0' : '0.25';
-                bubble.el.style.transform = `translate3d(${bubble.cx - bubble.radius}px, ${bubble.cy - bubble.radius}px, 0)`;
-            };
-
-            const createBubble = () => {
-                const el = document.createElement('span');
-                el.className = 'bubble';
-                bubbleContainer.appendChild(el);
-
-                const bubble = {
-                    el,
-                    radius: 0,
-                    mass: 0,
-                    cx: 0,
-                    cy: 0,
-                    vx: 0,
-                    vy: 0,
-                    life: 0,
-                    maxLife: 0,
-                    swirlAngle: 0,
-                    swirlSpeed: 0,
-                    swirlStrength: 0,
-                    wavePhase: 0,
-                    waveSpeed: 0,
-                    spin: 0,
-                    rotation: 0
-                };
-
-                resetBubble(bubble, true);
-                bubbles.push(bubble);
-            };
-
-            const ensureBubbleCount = () => {
-                currentSettings = getBubbleSettings();
-                updateContainerMetrics();
-
-                while (bubbles.length < currentSettings.count) {
-                    createBubble();
-                }
-
-                while (bubbles.length > currentSettings.count) {
-                    const bubble = bubbles.pop();
-                    bubble.el.remove();
-                }
-
-                bubbles.forEach(bubble => {
-                    const diameter = bubble.radius * 2;
-                    if (diameter < currentSettings.minSize * 0.85 || diameter > currentSettings.maxSize * 1.15) {
-                        resetBubble(bubble);
-                    }
-                });
-            };
-
-            ensureBubbleCount();
-
-            let lastTimestamp = null;
-
-            const animate = (timestamp) => {
-                if (lastTimestamp === null) {
-                    lastTimestamp = timestamp;
-                }
-
-                const deltaMs = timestamp - lastTimestamp;
-                lastTimestamp = timestamp;
-                const dt = Math.min(deltaMs, 48) / 1000;
-
-                const buoyancy = 12;
-                const maxHorizontalSpeed = 85;
-                const edgeDamping = 0.45;
-                const restitution = 0.32;
-
-                for (let i = 0; i < bubbles.length; i++) {
-                    const bubble = bubbles[i];
-                    bubble.life += deltaMs;
-
-                    bubble.swirlAngle += bubble.swirlSpeed * dt;
-                    bubble.wavePhase += bubble.waveSpeed * dt;
-
-                    const swirlForceX = Math.cos(bubble.swirlAngle) * bubble.swirlStrength;
-                    const swirlForceY = Math.sin(bubble.swirlAngle) * bubble.swirlStrength * 0.22;
-                    const waveForce = Math.sin(bubble.wavePhase * 2 + bubble.swirlAngle * 0.35) * 9;
-
-                    bubble.vx += (swirlForceX + waveForce) * dt;
-                    bubble.vy += swirlForceY * dt;
-                    bubble.vy -= buoyancy * dt;
-
-                    bubble.vx *= (1 - 0.08 * dt);
-                    bubble.vy *= (1 - 0.018 * dt);
-
-                    bubble.vx = Math.max(Math.min(bubble.vx, maxHorizontalSpeed), -maxHorizontalSpeed);
-                    bubble.rotation += bubble.spin * dt;
-                    if (bubble.rotation > Math.PI * 2 || bubble.rotation < -Math.PI * 2) {
-                        bubble.rotation %= (Math.PI * 2);
-                    }
-
-                    bubble.cx += bubble.vx * dt;
-                    bubble.cy += bubble.vy * dt;
-
-                    // boundary constraints
-                    if (bubble.cx < bubble.radius) {
-                        bubble.cx = bubble.radius;
-                        bubble.vx *= -edgeDamping;
-                    } else if (bubble.cx > containerWidth - bubble.radius) {
-                        bubble.cx = containerWidth - bubble.radius;
-                        bubble.vx *= -edgeDamping;
-                    }
-
-                    if (bubble.cy > containerHeight + bubble.radius * 1.5) {
-                        bubble.cy = containerHeight + bubble.radius * 1.5;
-                        bubble.vy *= -0.25;
-                    }
-
-                    // fade control (more discreet)
-                    const riseProgress = 1 - (bubble.cy / (containerHeight + bubble.radius));
-                    bubble.el.style.opacity = Math.min(0.65, Math.max(0, riseProgress + 0.08));
-
-                    // reposition if out of bounds or life exceeded
-                    if (bubble.cy + bubble.radius < -containerHeight * 0.15 || bubble.life > bubble.maxLife) {
-                        resetBubble(bubble);
-                        continue;
-                    }
-                }
-
-                // collision & response handling
-                for (let i = 0; i < bubbles.length; i++) {
-                    const bubbleA = bubbles[i];
-                    for (let j = i + 1; j < bubbles.length; j++) {
-                        const bubbleB = bubbles[j];
-                        const dx = bubbleB.cx - bubbleA.cx;
-                        const dy = bubbleB.cy - bubbleA.cy;
-                        const distance = Math.hypot(dx, dy);
-                        const minDist = bubbleA.radius + bubbleB.radius;
-
-                        if (distance > 0 && distance < minDist) {
-                            const nx = dx / distance;
-                            const ny = dy / distance;
-                            const overlap = (minDist - distance);
-
-                            // separate overlapping bubbles equally
-                            bubbleA.cx -= nx * overlap * 0.5;
-                            bubbleA.cy -= ny * overlap * 0.5;
-                            bubbleB.cx += nx * overlap * 0.5;
-                            bubbleB.cy += ny * overlap * 0.5;
-
-                            const relVel = (bubbleB.vx - bubbleA.vx) * nx + (bubbleB.vy - bubbleA.vy) * ny;
-                            if (relVel < 0) {
-                                const impulse = -(1 + restitution) * relVel / ((1 / bubbleA.mass) + (1 / bubbleB.mass));
-                                const impulseX = impulse * nx;
-                                const impulseY = impulse * ny;
-
-                                bubbleA.vx -= impulseX / bubbleA.mass;
-                                bubbleA.vy -= impulseY / bubbleA.mass;
-                                bubbleB.vx += impulseX / bubbleB.mass;
-                                bubbleB.vy += impulseY / bubbleB.mass;
-                            }
-
-                            // apply slight tangential interaction for more natural movement
-                            const tangentX = -ny;
-                            const tangentY = nx;
-                            const relTan = (bubbleB.vx - bubbleA.vx) * tangentX + (bubbleB.vy - bubbleA.vy) * tangentY;
-                            const surfaceFriction = relTan * 0.015;
-
-                            bubbleA.vx += (surfaceFriction * tangentX) / bubbleA.mass;
-                            bubbleA.vy += (surfaceFriction * tangentY) / bubbleA.mass;
-                            bubbleB.vx -= (surfaceFriction * tangentX) / bubbleB.mass;
-                            bubbleB.vy -= (surfaceFriction * tangentY) / bubbleB.mass;
-                        }
-                    }
-                }
-
-                // apply transforms after physics updates
-                for (let i = 0; i < bubbles.length; i++) {
-                    const bubble = bubbles[i];
-                    bubble.el.style.transform = `translate3d(${bubble.cx - bubble.radius}px, ${bubble.cy - bubble.radius}px, 0) rotate(${bubble.rotation}rad)`;
-                }
-
-                requestAnimationFrame(animate);
-            };
-
-            requestAnimationFrame(animate);
-
-            let resizeTimeout;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(() => {
-                    ensureBubbleCount();
-                }, 120);
-            });
+        function resizeCanvas(){
+            if(!lavaCanvas) return;
+            // Cap DPR to 1 for performance (avoids large fill area on HiDPI screens)
+            const dpr = 1;
+            lavaCanvas.width = innerWidth * dpr;
+            lavaCanvas.height = innerHeight * dpr;
+            lavaCanvas.style.width = innerWidth + 'px';
+            lavaCanvas.style.height = innerHeight + 'px';
+            ctx.setTransform(1,0,0,1,0,0); // reset before scaling
+            ctx.scale(dpr, dpr);
         }
 
-        // Active navigation highlighting and inline progress fill
-        const onScrollUpdate = () => {
-            const scrollPosition = window.scrollY || window.pageYOffset;
-            let current = '';
-            let activeSection = null;
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop - 120;
-                const sectionHeight = section.offsetHeight;
-                if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-                    current = section.getAttribute('id');
-                    activeSection = { section, sectionTop, sectionHeight };
-                }
-            });
+        // Simplified single configuration (always low) for minimal resource usage
+        const baseConfig = { low: {count: 3, blur: 8} };
 
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                link.style.removeProperty('--nav-progress');
-                if (link.getAttribute('href') === `#${current}`) {
-                    link.classList.add('active');
-                }
-            });
-
-            // Drive the underline fill of the active link via CSS variable
-            if (activeSection) {
-                const progress = Math.min(Math.max((scrollPosition - activeSection.sectionTop) / activeSection.sectionHeight, 0), 1);
-                const activeLink = navLinks.find(l => l.classList.contains('active'));
-                if (activeLink) activeLink.style.setProperty('--nav-progress', progress);
+        function initBlobs(){
+            blobs = [];
+            const { count } = baseConfig.low;
+            for(let i=0;i<count;i++){
+                const radius = rnd(40, 70); // smaller blobs
+                blobs.push({
+                    x: rnd(radius, innerWidth - radius),
+                    y: rnd(innerHeight*0.7, innerHeight + 100),
+                    r: radius,
+                    vx: rnd(-15, 15), // gentle horizontal drift
+                    vy: rnd(-35, -20) // consistent upward movement (negative = up)
+                });
             }
-        };
+        }
 
-        window.addEventListener('scroll', onScrollUpdate);
-        window.addEventListener('DOMContentLoaded', onScrollUpdate);
+        function applyPerfMode(){
+            lavaCanvas.classList.add('low-perf');
+            initBlobs();
+        }
+
+        // Performance toggle removed; site locked in low mode
+
+        // Interaction listeners removed (no dynamic FPS adjustments needed)
+
+        document.addEventListener('visibilitychange', ()=> { animationPaused = document.hidden; if(!animationPaused) lastTs=null; });
+        const prefersReducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+        if(prefersReducedMotion.matches) animationPaused = true;
+        prefersReducedMotion.addEventListener('change', e=> { animationPaused = e.matches; });
+
+        function renderBlurLayer(callback, blur){
+            // Use multiply blend mode for darker overlaps (Venn diagram effect)
+            ctx.save();
+            ctx.globalCompositeOperation = 'multiply';
+            callback();
+            ctx.restore();
+        }
+
+        function drawBlob(b){
+            // Warmer, more pleasing orange with good transparency
+            ctx.fillStyle = 'rgba(255, 140, 60, 0.45)'; // warm peachy orange
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+            ctx.fill();
+        }
+
+        function animateCanvas(ts){
+            if(animationPaused || !ctx){ requestAnimationFrame(animateCanvas); return; }
+            if(lastTs===null) lastTs = ts;
+            let delta = ts - lastTs; lastTs = ts;
+            const target = targetLowFPS;
+            skipAccumulator += delta;
+            if(skipAccumulator < target){ requestAnimationFrame(animateCanvas); return; }
+            skipAccumulator = 0;
+            delta = Math.min(delta, 64);
+
+            ctx.clearRect(0,0, innerWidth, innerHeight);
+            renderBlurLayer(()=> {
+                const dt = delta / 1000; // delta in seconds
+                
+                // Update positions with smooth upward motion
+                for(const b of blobs){
+                    b.x += b.vx * dt;
+                    b.y += b.vy * dt; // vy is negative, so blobs move upward
+                    
+                    // Gentle horizontal bounce off walls with damping
+                    if(b.x - b.r < 0){
+                        b.x = b.r;
+                        b.vx = Math.abs(b.vx) * 0.7; // dampen bounce
+                    } else if(b.x + b.r > innerWidth){
+                        b.x = innerWidth - b.r;
+                        b.vx = -Math.abs(b.vx) * 0.7;
+                    }
+                    
+                    // Wrap around vertically (continuous upward flow into header)
+                    if(b.y + b.r < -100){
+                        // Blob disappeared into header, reset to bottom
+                        b.y = innerHeight + b.r + rnd(0, 100);
+                        b.x = rnd(b.r, innerWidth - b.r);
+                        b.vx = rnd(-15, 15);
+                        b.vy = rnd(-35, -20);
+                    }
+                }
+                
+                // Draw all blobs (multiply blend creates darker overlaps automatically)
+                for(const b of blobs){
+                    drawBlob(b);
+                }
+            }, baseConfig.low.blur);
+
+            requestAnimationFrame(animateCanvas);
+        }
+
+        if(ctx){
+            resizeCanvas();
+            applyPerfMode();
+            if('requestIdleCallback' in window){
+                requestIdleCallback(()=> requestAnimationFrame(animateCanvas), { timeout: 1200 });
+            } else {
+                setTimeout(()=> requestAnimationFrame(animateCanvas), 120);
+            }
+            let resizeTimeout;
+            window.addEventListener('resize', ()=> { clearTimeout(resizeTimeout); resizeTimeout=setTimeout(()=> { resizeCanvas(); initBlobs(); }, 150); }, { passive:true });
+        }
+
+        // Active navigation highlighting using IntersectionObserver (reduces layout reads for INP)
+        const navObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    navLinks.forEach(link => {
+                        const isActive = link.getAttribute('href') === `#${id}`;
+                        link.classList.toggle('active', isActive);
+                        if (isActive) {
+                            // set progress to 0 initially; a second observer can update progress
+                            link.style.setProperty('--nav-progress', 0);
+                        }
+                    });
+                }
+            });
+        }, { root: null, threshold: 0.4 });
+
+        sections.forEach(s => navObserver.observe(s));
+
+        // Section progress tracking (lightweight) via another observer for top/bottom sentinel elements
+        sections.forEach(section => {
+            const progressBarUpdater = () => {
+                const rect = section.getBoundingClientRect();
+                const vh = window.innerHeight;
+                if (rect.height <= 0) return;
+                const visible = Math.min(vh, Math.max(0, vh - Math.max(0, rect.top < 0 ? -rect.top : rect.bottom - vh)));
+                const progress = Math.min(1, Math.max(0, (vh - rect.top) / (vh + rect.height)));
+                const link = navLinks.find(l => l.getAttribute('href') === `#${section.id}`);
+                if (link) link.style.setProperty('--nav-progress', progress.toFixed(3));
+            };
+            // Throttle with rAF on scroll/resize
+            let pending = false;
+            const schedule = () => {
+                if (pending) return; pending = true; requestAnimationFrame(()=>{ pending=false; progressBarUpdater(); });
+            };
+            window.addEventListener('scroll', schedule, { passive: true });
+            window.addEventListener('resize', schedule);
+        });
 
         // Add subtle animation on scroll
         const observerOptions = {
